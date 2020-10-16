@@ -1,3 +1,1 @@
-# TrumpFFF
-
-F for (no) respect
+# eloq
