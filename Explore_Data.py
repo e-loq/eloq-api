@@ -24,13 +24,13 @@ def generate_image(df:pd.DataFrame):
     coords.cartesianX *= 100
     coords.cartesianX = coords.cartesianX.round().astype(np.int32)
 
-    coords.cartesianY *= 1000
+    coords.cartesianY *= 100
     coords.cartesianY = coords.cartesianY.round().astype(np.int32)
 
     maxx = coords.cartesianX.max()
     maxy = coords.cartesianY.max()
 
-    matrix_bw = np.zeros([maxx + 1, maxy + 1])
+    matrix_bw = np.zeros([maxx + 1, maxy + 1], np.uint8)
     matrix_bw[coords.cartesianX.values, coords.cartesianY.values] = 255
     img = Image.fromarray(matrix_bw, "L")
     return img
