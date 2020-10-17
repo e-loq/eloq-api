@@ -1,5 +1,4 @@
 from flask import Flask, request, jsonify
-import sys
 from flask_cors import CORS, cross_origin
 
 app = Flask(__name__)
@@ -11,10 +10,12 @@ def hello_world():
 
 @app.route('/upload', methods=["POST"])
 def upload_file():
-    print("asdf")
     data = request.get_json()
-    url = data["url"]
-    return jsonify(data) 
+    file_path = data["file_path"]
+    print(file_path)
+    
+    # trigger run 
+    return ""
 
 if __name__ == "__main__":
     app.run(debug=True)
