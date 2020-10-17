@@ -21,10 +21,10 @@ def generate_image(df:pd.DataFrame):
     coords.cartesianX -= minx
     coords.cartesianY -= miny
 
-    coords.cartesianX *= 100
+    coords.cartesianX *= 1000
     coords.cartesianX = coords.cartesianX.round().astype(np.int32)
 
-    coords.cartesianY *= 100
+    coords.cartesianY *= 1000
     coords.cartesianY = coords.cartesianY.round().astype(np.int32)
 
     maxx = coords.cartesianX.max()
@@ -50,7 +50,7 @@ gmm = gmm.fit(sampled_data.reshape(-1,1))
 floor_id = np.argmin(gmm.means_)
 ceil_id = np.argmax(gmm.means_)
 
-floor_cutoff = (gmm.means_[floor_id] + np.sqrt(gmm.covariances_[floor_id])*2 + 1).reshape(-1)[0]
+floor_cutoff = (gmm.means_[floor_id] + np.sqrt(gmm.covariances_[floor_id])*2).reshape(-1)[0]
 ceil_cutoff = (gmm.means_[ceil_id] - np.sqrt(gmm.covariances_[ceil_id])*2).reshape(-1)[0]
 
 df = df[df.cartesianZ > floor_cutoff]
@@ -60,5 +60,6 @@ df_plot.plot.scatter("cartesianX", "cartesianY", s=1, figsize=(15, 10))
 # plt.show()
 
 img = generate_image(df)
-img.save('data/image.png')
-img.show()
+# (width, height) = (img.width // 4, img.height // 4)
+# img = img.resize((width, height))
+img.save('data/img_original.png')
