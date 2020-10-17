@@ -50,7 +50,7 @@ gmm = gmm.fit(sampled_data.reshape(-1,1))
 floor_id = np.argmin(gmm.means_)
 ceil_id = np.argmax(gmm.means_)
 
-floor_cutoff = (gmm.means_[floor_id] + np.sqrt(gmm.covariances_[floor_id])*2).reshape(-1)[0]
+floor_cutoff = (gmm.means_[floor_id] + np.sqrt(gmm.covariances_[floor_id])*2 + 1).reshape(-1)[0]
 ceil_cutoff = (gmm.means_[ceil_id] - np.sqrt(gmm.covariances_[ceil_id])*2).reshape(-1)[0]
 
 df = df[df.cartesianZ > floor_cutoff]

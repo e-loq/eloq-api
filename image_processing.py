@@ -1,6 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import cv2
+import math
 
 
 def show_images(images, cols=1, titles=None):
@@ -46,12 +47,21 @@ def show_image(img, title = ''):
 input_img = cv2.imread(f'data/image.png')
 
 images = []
-kernel = np.ones((5, 5), np.uint8)
+images.append(input_img)
+kernel = np.ones((3, 3), np.uint8)
 erosion = cv2.erode(input_img, kernel, iterations=1)
 dilation = cv2.dilate(input_img, kernel, iterations=1)
 opening = cv2.morphologyEx(input_img, cv2.MORPH_OPEN, kernel)  # erosion followed by dilation
 closing = cv2.morphologyEx(input_img, cv2.MORPH_CLOSE, kernel)  # dilation follows by erosion
 
+
+
+erosion = cv2.erode(input_img, kernel, iterations=1)
+dilation = cv2.dilate(erosion, kernel, iterations=1)
+# erosion = cv2.erode(dilation, kernel, iterations=1)
+# dilation = cv2.dilate(erosion, kernel, iterations=1)
+# cv2.imwrite(f'data/img_closing.png', dilation)
+images.append(dilation)
 '''
 images = []
 for x in [3, 5, 7, 9, 11, 13]:
@@ -84,22 +94,20 @@ for x in [3,5,7]:
 '''
 
 # edge detection
-canny = cv2.Canny(closing, 200, 400, apertureSize=3, L2gradient=False)
+canny = cv2.Canny(dilation, 200, 400, apertureSize=3, L2gradient=False)
 laplacian = cv2.Laplacian(closing, cv2.CV_8U)
 sobel = cv2.Sobel(closing, cv2.CV_64F, 1, 1, ksize=5)  # try 1,1 instead of 1,0 or 0,1
 sobelx = cv2.Sobel(closing, cv2.CV_64F, 1, 0, ksize=5)  # try 1,1 instead of 1,0 or 0,1
 sobely = cv2.Sobel(closing, cv2.CV_64F, 0, 1, ksize=5)  # also change kernel size
 
 
-cv2.imwrite('data/img_canny.png', canny)
+images.append(canny)
 
 # blurring
 blur = cv2.blur(canny, (3, 3))
 gaussian_blur = cv2.GaussianBlur(canny, (3, 3), 1)
 median_blur = cv2.medianBlur(canny, 3)
 bilateral_blur = cv2.bilateralFilter(canny, 9, 9 * 2, 9. / 2)
-
-# show_images([canny])
 
 # cv2.imwrite('data/img_canny.png', canny)
 # cv2.imwrite('data/img_laplacian.png', laplacian)
@@ -110,3 +118,31 @@ bilateral_blur = cv2.bilateralFilter(canny, 9, 9 * 2, 9. / 2)
 # plot_two_images(input_img, laplacian, 'Laplacian')
 # plot_two_images(input_img, sobelx, 'SobelX')
 # plot_two_images(input_img, sobely, 'SobelY')
+
+'''
+lines = cv2.HoughLines(canny, 1, np.pi / 180, 150, None, 0, 0)
+
+if lines is not None:
+    for i in range(0, len(lines)):
+        rho = lines[i][0][0]
+        theta = lines[i][0][1]
+        a = math.cos(theta)
+        b = math.sin(theta)
+        x0 = a * rho
+        y0 = b * rho
+        pt1 = (int(x0 + 1000 * (-b)), int(y0 + 1000 * (a)))
+        pt2 = (int(x0 - 1000 * (-b)), int(y0 - 1000 * (a)))
+        cv2.line(canny, pt1, pt2, (0, 0, 255), 3, cv2.LINE_AA)
+
+show_image(canny)
+'''
+
+linesP = cv2.HoughLinesP(canny, 1, np.pi / 180, 50, None, 50, 10)
+
+if linesP is not None:
+    for i in range(0, len(linesP)):
+        l = linesP[i][0]
+        cv2.line(canny, (l[0], l[1]), (l[2], l[3]), (0, 0, 255), 1, cv2.LINE_AA)
+
+
+# show_images(images)
