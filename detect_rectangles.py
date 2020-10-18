@@ -2,9 +2,10 @@ import os
 import numpy as np
 import cv2 as cv
 import uuid
-
+from scipy.spatial import ConvexHull
 import json_exporter
-
+import copy
+from typing import Tuple
 cv2 = cv
 
 # TODO don't hardcode
@@ -21,8 +22,63 @@ def morph(input_img):
     return morph_img
 
 
+def separate_wall(img_:np.ndarray, threshold:np.float=3.0)-> Tuple[np.ndarray, np.ndarray]:
+    """
+    Naive wall vs obstacles separations
+    Parameters
+    ----------
+    img_ : the image input matrix
+    threshold : percentage threshold to define wall vs everytihng else
+
+    Returns : Tuple[obstacles:np.ndarray, walls: np.ndarray]
+    -------
+    """
+
+    img_original = copy.deepcopy(img_)
+    img_wall = copy.deepcopy(img_) * 0
+    img_obstacles = copy.deepcopy(img_)
+
+    def point_to_line(point, p1, p2):
+        # line between p1, p2
+
+        # check calculate shapes
+        assert p1.shape[0] == 2
+        assert p2.shape[0] == 2
+        assert point.shape[1] == 2
+
+        zaeler = np.abs((p2[1] - p1[1]) * point[:, 0] - (p2[0] - p1[0]) * point[:, 1] + p2[0] * p1[1] - p2[1] * p1[0])
+        nenner = np.sqrt(np.square(p2[1] - p1[1]) + np.square(p2[0] - p1[0]))
+        return zaeler / nenner
+
+    point_coords_original_img = np.where(img_original > 3)
+    point_coords_original_img = np.hstack([point_coords_original_img[0].reshape([-1, 1]),
+                                           point_coords_original_img[1].reshape([-1, 1])])
+    hull = ConvexHull(point_coords_original_img)
+    hull_points = point_coords_original_img[hull.vertices]
+
+    for ix in range(hull_points.shape[0]):
+        start = hull_points[ix, :]
+        if (ix + 1) == hull_points.shape[0]:
+            end = hull_points[0, :]
+        else:
+            end = hull_points[ix + 1, :]
+        distances = point_to_line(point_coords_original_img, start, end)
+        thresh = np.percentile(distances, threshold)  # 0.001 - one promile
+        zero_point_coords = point_coords_original_img[np.where(distances < thresh)]
+        img_obstacles[zero_point_coords[:, 0], zero_point_coords[:, 1]] = 0  # inverted?
+        img_wall[zero_point_coords[:, 0], zero_point_coords[:, 1]] = img_original[zero_point_coords[:, 0], zero_point_coords[:, 1]]
+
+    return img_obstacles, img_wall
+
 # height map
-img_original = cv.imread('data/entire_hall.png', 0)
+img_original_ = cv.imread('data/entire_hall.png', 0)
+
+
+img_obstacles, img_wall = separate_wall(img_original_, 6)
+
+# TODO set this to run with the correct input depending on what you would like to use
+img_original = img_obstacles
+img_original = img_wall
 
 img_all_colors = cv2.cvtColor(img_original, cv2.COLOR_GRAY2RGB)
 
