@@ -10,6 +10,7 @@ from scipy.spatial import ConvexHull
 import json_exporter
 import copy
 from typing import Tuple
+import os
 cv2 = cv
 
 fname_img_original = f'img_original.png'  # name of the image generated from the pointcloud
@@ -32,7 +33,7 @@ def morph(input_img):
 
 def create_image(e57_path: str):
     resolution = 100
-    load_file = True
+    load_file = os.path.exists(f'data/' + fname_img_original)
 
     print(f'Loading the e57 file...')
     e57 = pye57.E57(e57_path)
@@ -272,15 +273,7 @@ def image_processing(e57_path):
 
     export_json(img_input, contours_obstacles + contours_walls, original_interval_m)
 
-
-
     return image_path, json_path
 
 if __name__ == "__main__":
     image_processing(f'data/CustomerCenter1.e57')
-
-
-
-
-
-
