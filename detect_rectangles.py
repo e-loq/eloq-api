@@ -22,6 +22,8 @@ def morph(input_img):
     return morph_img
 
 
+# Test commit
+
 def separate_wall(img_:np.ndarray, threshold:np.float=3.0)-> Tuple[np.ndarray, np.ndarray]:
     """
     Naive wall vs obstacles separations
