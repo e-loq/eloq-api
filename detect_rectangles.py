@@ -22,7 +22,8 @@ def morph(input_img):
 
 
 # height map
-img_original = cv.imread('data/entire_hall.png', 0)
+background_img_path = 'data/entire_hall.png'
+img_original = cv.imread(background_img_path, 0)
 
 img_all_colors = cv2.cvtColor(img_original, cv2.COLOR_GRAY2RGB)
 
@@ -140,4 +141,4 @@ for contour, height_intensity in all_contours:
          'shapeId': str(uuid.uuid1())
          })
 
-json_exporter.export('data/result.json', layers_json_format)
+json_exporter.export('data/result.json', layers_json_format, background_img_path)
