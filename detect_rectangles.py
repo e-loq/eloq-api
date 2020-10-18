@@ -1,6 +1,9 @@
 import os
 import numpy as np
 import cv2 as cv
+import uuid
+
+import json_exporter
 
 cv2 = cv
 
@@ -17,6 +20,7 @@ def morph(input_img):
     morph_img = cv2.dilate(morph_img, kernel, iterations=1)
     return morph_img
 
+
 # height map
 img_original = cv.imread('data/entire_hall.png', 0)
 
@@ -30,7 +34,8 @@ all_contours = []
 
 color_interval_len = 32
 remove_last_interval = 1
-for color_interval_start in range(color_interval_len, 255 - remove_last_interval * color_interval_len, color_interval_len):
+for color_interval_start in range(color_interval_len, 255 - remove_last_interval * color_interval_len,
+                                  color_interval_len):
     img = cv.inRange(img_original, color_interval_start, color_interval_start + color_interval_len)
 
     contours, hierarchy = cv.findContours(img, cv2.RETR_TREE, cv.CHAIN_APPROX_SIMPLE)
@@ -96,7 +101,8 @@ for color_interval_start in range(color_interval_len, 255 - remove_last_interval
             if area >= 10000:
                 create_graph(hull, (0, 0, 255), img_area_filtered)
                 create_graph(hull, (0, 0, 255), img_all_colors)
-                all_contours.append(currentContour)
+                col_range_end = color_interval_start + color_interval_len
+                all_contours.append((currentContour, col_range_end))
 
     # Finally show the image
     if not os.path.exists('data/steps'):
@@ -112,20 +118,26 @@ for color_interval_start in range(color_interval_len, 255 - remove_last_interval
 cv.imwrite(f'data/steps/img_final_all_contours.png', img_all_colors)
 
 
-# TODO
-
-def map_to_interval(point, old_interval, new_interval):
-    pass
-
-# points_json_format = []
-# for contour in all_contours:
-#     contour_points = []
-#     for i, point in enumerate(contour):
-#         contour_points.append({'x': point[0][0], 'y': point[0][1], 'id': i})
+def map_to_interval(val, old_interval, new_interval):
+    A, B = old_interval
+    a, b = new_interval
+    return (val - A) * (b - a) / (B - A) + a
 
 
+interval_x = (0, img_original.shape[1])
+interval_y = (0, img_original.shape[0])
+layers_json_format = []
+for contour, height_intensity in all_contours:
+    contour_points = []
+    for i, point in enumerate(contour):
+        contour_points.append({'x': round(map_to_interval(point[0][0], interval_x, original_interval['x']), 2),
+                               'y': round(map_to_interval(point[0][1], interval_y, original_interval['y']), 2), 'id': i + 1})
 
+    layers_json_format.append(
+        {'points': contour_points,
+         'height': round(map_to_interval(height_intensity, (0, 255), original_interval['z']), 2),
+         'shape_type': 'obstacle',
+         'shapeId': str(uuid.uuid1())
+         })
 
-
-
-
+json_exporter.export('data/result.json', layers_json_format)
