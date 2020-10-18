@@ -242,7 +242,7 @@ def valentins_part(img_all_colors, img_original, shape_type):
     return all_contours
 
 
-def export_json(img_original, all_contours, original_interval_m):
+def export_json(img_original, all_contours, original_interval_m, ceil_height, max_z):
     def map_to_interval(val, old_interval, new_interval):
         A, B = old_interval
         a, b = new_interval
@@ -264,7 +264,7 @@ def export_json(img_original, all_contours, original_interval_m):
              'shape_type': shape_type,
              'shapeId': str(uuid.uuid1())
              })
-    json_exporter.export('data/result.json', layers_json_format, f'data/{fname_img_original}')
+    json_exporter.export('data/result.json', layers_json_format, f'data/{fname_img_original}', ceil_height, max_z)
 
 
 def image_processing(e57_path):
