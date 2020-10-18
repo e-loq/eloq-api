@@ -36,6 +36,7 @@ def morph(input_img):
 
 def create_image(e57_path: str):
     resolution = 100
+    # TODO: THIS IS JUST FOR TESTING!!!!
     load_file = os.path.exists(f'data/' + fname_img_original)
 
     print(f'Loading the e57 file...')
@@ -65,7 +66,7 @@ def create_image(e57_path: str):
     global max_z
     ceil_height = ceil_cutoff
     print(f'... done.')
-    print(f'Floor cutoff: {floor_cutoff}; ceiling cutoff: {ceil_cutoff} /n')
+    print(f'Floor cutoff: {floor_cutoff}; ceiling cutoff: {ceil_cutoff} \n')
 
     print(f'Generating the image from the pointcloud...')
     df = df[df.cartesianZ > floor_cutoff]
