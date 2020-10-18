@@ -21,8 +21,11 @@ def upload_file():
         json_data = f.read()
 
     # remp image data
-    with open("./data/image.png", "rb") as image_file:
+    with open("./data/img_r192_5_img_all_colors.png", "rb") as image_file:
         encoded_string = b64encode(image_file.read()).decode('ascii')
+
+    # with open("./data/img_original.png", "rb") as image_file:
+    #     encoded_string_original = b64encode(image_file.read()).decode('ascii')
 
     resp_data = {
         "json": json_data,
