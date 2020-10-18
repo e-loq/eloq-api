@@ -1,6 +1,6 @@
 import json
 
-def export(output_path: str, points: dict):
+def export(output_path: str, points: list):
     """
     Exports the data to the desired JSON schema
 
