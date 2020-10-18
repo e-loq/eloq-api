@@ -42,8 +42,10 @@ def show_image(img, title = ''):
     plt.imshow(img, cmap='gray')
     plt.show()
 
+resolution = 100
+filename = f'data/image_{resolution}_floorincluded'
 
-input_img = cv2.imread(f'data/image_test.png')
+input_img = cv2.imread(filename + f'.png')
 # images = []
 # titles = []
 # images.append(input_img)
@@ -52,15 +54,16 @@ input_img = cv2.imread(f'data/image_test.png')
 # Morphology
 
 # for x in [3,5,7,9,11,13,15,17,19,21,23,25]:
-kernel = np.ones((21, 21), np.uint8)
+print(f'Applying morphological operations...')
+kernel = np.ones((7, 7), np.uint8)
 morph_img = cv2.dilate(input_img, kernel, iterations=1)
 morph_img = cv2.morphologyEx(morph_img, cv2.MORPH_OPEN, kernel)
 morph_img = cv2.morphologyEx(morph_img, cv2.MORPH_CLOSE, kernel)
 
-kernel = np.ones((20, 20), np.uint8)
-morph_img = cv2.dilate(morph_img, kernel, iterations=1)
-
-cv2.imwrite(f'data/img_test_morph.png', morph_img)
+# kernel = np.ones((6, 6), np.uint8)
+# morph_img = cv2.dilate(morph_img, kernel, iterations=1)
+print(f'.. done.')
+cv2.imwrite(filename + f'_morph.png', morph_img)
 
 # img_blur = cv2.medianBlur(morph_img, 3)
 
@@ -102,8 +105,11 @@ for x in [3,5,7]:
 
 # edge detection
 canny_img = cv2.Canny(morph_img, 75, 250, apertureSize=3, L2gradient=True)
-cv2.imwrite(f'data/img_canny.png', canny_img)
+cv2.imwrite(filename + f'_canny.png', canny_img)
 
+spacing = np.zeros((), np.uint8)
+final_img = np.vstack((input_img, spacing, morph_img, spacing, canny_img))
+cv2.imwrite(f'data/img_all_combined', final_img)
 exit(0)
 
 gftt_img = np.zeros((canny_img.shape[0], canny_img.shape[1]), np.uint8)

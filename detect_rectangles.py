@@ -71,7 +71,8 @@ def separate_wall(img_:np.ndarray, threshold:np.float=3.0)-> Tuple[np.ndarray, n
     return img_obstacles, img_wall
 
 # height map
-img_original_ = cv.imread('data/entire_hall.png', 0)
+background_img_path = 'data/entire_hall.png'
+img_original_ = cv.imread(background_img_path, 0)
 
 
 img_obstacles, img_wall = separate_wall(img_original_, 6)
@@ -79,6 +80,7 @@ img_obstacles, img_wall = separate_wall(img_original_, 6)
 # TODO set this to run with the correct input depending on what you would like to use
 img_original = img_obstacles
 img_original = img_wall
+
 
 img_all_colors = cv2.cvtColor(img_original, cv2.COLOR_GRAY2RGB)
 
@@ -196,4 +198,4 @@ for contour, height_intensity in all_contours:
          'shapeId': str(uuid.uuid1())
          })
 
-json_exporter.export('data/result.json', layers_json_format)
+json_exporter.export('data/result.json', layers_json_format, background_img_path)
