@@ -22,8 +22,6 @@ def morph(input_img):
     return morph_img
 
 
-# Test commit
-
 def separate_wall(img_:np.ndarray, threshold:np.float=3.0)-> Tuple[np.ndarray, np.ndarray]:
     """
     Naive wall vs obstacles separations
@@ -34,6 +32,7 @@ def separate_wall(img_:np.ndarray, threshold:np.float=3.0)-> Tuple[np.ndarray, n
 
     Returns : Tuple[obstacles:np.ndarray, walls: np.ndarray]
     -------
+    TODO fix the distance of wall to the bounding box!
     """
 
     img_original = copy.deepcopy(img_)
@@ -52,7 +51,7 @@ def separate_wall(img_:np.ndarray, threshold:np.float=3.0)-> Tuple[np.ndarray, n
         nenner = np.sqrt(np.square(p2[1] - p1[1]) + np.square(p2[0] - p1[0]))
         return zaeler / nenner
 
-    point_coords_original_img = np.where(img_original > 3)
+    point_coords_original_img = np.where(img_original > 0)
     point_coords_original_img = np.hstack([point_coords_original_img[0].reshape([-1, 1]),
                                            point_coords_original_img[1].reshape([-1, 1])])
     hull = ConvexHull(point_coords_original_img)
@@ -65,8 +64,8 @@ def separate_wall(img_:np.ndarray, threshold:np.float=3.0)-> Tuple[np.ndarray, n
         else:
             end = hull_points[ix + 1, :]
         distances = point_to_line(point_coords_original_img, start, end)
-        thresh = np.percentile(distances, threshold)  # 0.001 - one promile
-        zero_point_coords = point_coords_original_img[np.where(distances < thresh)]
+        #thresh = np.percentile(distances, threshold)  # 0.001 - one promile
+        zero_point_coords = point_coords_original_img[np.where(distances < 80)]
         img_obstacles[zero_point_coords[:, 0], zero_point_coords[:, 1]] = 0  # inverted?
         img_wall[zero_point_coords[:, 0], zero_point_coords[:, 1]] = img_original[zero_point_coords[:, 0], zero_point_coords[:, 1]]
 
@@ -77,7 +76,7 @@ background_img_path = 'data/entire_hall.png'
 img_original_ = cv.imread(background_img_path, 0)
 
 
-img_obstacles, img_wall = separate_wall(img_original_, 6)
+img_obstacles, img_wall = separate_wall(img_original_, 1.5)
 
 # TODO set this to run with the correct input depending on what you would like to use
 img_original = img_obstacles
