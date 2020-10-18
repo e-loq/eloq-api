@@ -1,7 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import cv2
-import math
 
 
 def show_images(images, cols=1, titles=None):
@@ -61,7 +60,7 @@ morph_img = cv2.morphologyEx(morph_img, cv2.MORPH_CLOSE, kernel)
 kernel = np.ones((20, 20), np.uint8)
 morph_img = cv2.dilate(morph_img, kernel, iterations=1)
 
-cv2.imwrite(f'data/img_morph.png', morph_img)
+cv2.imwrite(f'data/img_test_morph.png', morph_img)
 
 # img_blur = cv2.medianBlur(morph_img, 3)
 
@@ -105,13 +104,15 @@ for x in [3,5,7]:
 canny_img = cv2.Canny(morph_img, 75, 250, apertureSize=3, L2gradient=True)
 cv2.imwrite(f'data/img_canny.png', canny_img)
 
+exit(0)
+
 gftt_img = np.zeros((canny_img.shape[0], canny_img.shape[1]), np.uint8)
 corners = cv2.goodFeaturesToTrack(canny_img, 25, 0.01, 10)
 corners = np.int0(corners)
 
 for i in corners:
     x, y = i.ravel()
-    cv2.circle(gftt_img,(x,y),3,255,-1)
+    cv2.circle(gftt_img, (x,y), 3, 255, -1)
 
 cv2.imwrite(f'data/img_gftt.png', canny_img)
 

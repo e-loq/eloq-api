@@ -1,20 +1,24 @@
 import pandas as pd
 import numpy as np
-import matplotlib.pyplot as plt
 from sklearn.mixture import GaussianMixture
 from PIL import Image
+import pye57
 
 
 def get_distributions(df:pd.DataFrame, col:str):
     dc = df[col]
-    dc.plot.hist(bins=90)
+    # dc.plot.hist(bins=90)
     # plt.show()
     # plt.close()
     return dc
 
-df = pd.read_pickle("data/df_reduced.pkl")
-dc = get_distributions(df, "cartesianZ")
 
+e57 = pye57.E57('data/CustomerCenter1.e57')
+data_raw = e57.read_scan_raw(0)
+df = pd.DataFrame(data_raw)
+
+# df = pd.read_pickle("data/df_reduced.pkl")
+dc = get_distributions(df, "cartesianZ")
 
 dc_hist = np.histogram(dc.values, bins=80)
 hist_weights = dc_hist[0] / dc_hist[0].sum()
@@ -43,7 +47,7 @@ coords.cartesianX -= minx
 coords.cartesianY -= miny
 coords.cartesianZ -= minz
 
-amount = 50
+amount = 1000
 coords.cartesianX *= amount
 coords.cartesianX = coords.cartesianX.round().astype(np.int32)
 
