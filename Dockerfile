@@ -7,4 +7,6 @@ ADD data/df_reduced.pkl src/data/
 WORKDIR /src/
 RUN pip install -r requirements.txt
 
+EXPOSE 5000
+
 CMD [ "python", "./api.py" ]
