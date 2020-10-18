@@ -26,7 +26,7 @@ def upload_file():
 
     resp_data = {
         "json": json_data,
-        "img": encoded_string
+        "img": [encoded_string, encoded_string]
     }
 
     # trigger run 
