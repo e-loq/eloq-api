@@ -1,7 +1,7 @@
 import json
 import base64
 
-def export(output_path: str, points: list, background_img_path: str):
+def export(output_path: str, points: list, background_img_path: str, ceil_height, max_z):
     """
     Exports the data to the desired JSON schema
 
@@ -9,8 +9,8 @@ def export(output_path: str, points: list, background_img_path: str):
         output_path (str): destination file path
         points (dict): point data according to the specific schema
     """
-    ceiling_height = 10.0
-    max_sat_height = 9.5
+    ceiling_height = ceil_height
+    max_sat_height = max_z
     data = {
         "unit": "m",
         "z_ceil":  ceiling_height,

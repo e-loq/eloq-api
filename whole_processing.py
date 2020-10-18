@@ -21,6 +21,9 @@ maxx = None
 maxy = None
 maxz = None
 
+ceil_height = 0
+max_z = 0
+
 def morph(input_img):
     kernel = np.ones((21, 21), np.uint8)
     morph_img = cv2.dilate(input_img, kernel, iterations=1)
@@ -57,6 +60,10 @@ def create_image(e57_path: str):
 
     floor_cutoff = (gmm.means_[floor_id] + np.sqrt(gmm.covariances_[floor_id])*0.5).reshape(-1)[0]
     ceil_cutoff = (gmm.means_[ceil_id] - np.sqrt(gmm.covariances_[ceil_id])*2.0).reshape(-1)[0]
+
+    global ceil_height
+    global max_z
+    ceil_height = ceil_cutoff
     print(f'... done.')
     print(f'Floor cutoff: {floor_cutoff}; ceiling cutoff: {ceil_cutoff} /n')
 
@@ -72,6 +79,8 @@ def create_image(e57_path: str):
     maxx = coords.cartesianX.max()
     maxy = coords.cartesianY.max()
     maxz = coords.cartesianZ.max()
+
+    max_z = maxz
 
     if not load_file:
         coords.cartesianX -= minx
@@ -271,7 +280,7 @@ def image_processing(e57_path):
 
     cv2.imwrite(image_path, img_all_colors)
 
-    export_json(img_input, contours_obstacles + contours_walls, original_interval_m)
+    export_json(img_input, contours_obstacles + contours_walls, original_interval_m, ceil_height, max_z)
 
     return image_path, json_path
 
