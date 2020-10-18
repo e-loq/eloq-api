@@ -5,13 +5,20 @@ import cv2 as cv
 cv2 = cv
 
 
-def morph(morph_img):
-    kernel = np.ones((3, 3), np.uint8)
-    morph_img = cv2.dilate(morph_img, kernel, iterations=3)
-    morph_img = cv2.erode(morph_img, kernel, iterations=1)
+def morph(input_img):
+    kernel = np.ones((21, 21), np.uint8)
+    morph_img = cv2.dilate(input_img, kernel, iterations=1)
+    morph_img = cv2.morphologyEx(morph_img, cv2.MORPH_OPEN, kernel)
+    morph_img = cv2.morphologyEx(morph_img, cv2.MORPH_CLOSE, kernel)
+    kernel = np.ones((20, 20), np.uint8)
+    morph_img = cv2.dilate(morph_img, kernel, iterations=1)
     return morph_img
 
-img_original = cv.imread('data/height_map.png', 0)
+img_original = cv.imread('data/entire_hall.png', 0)
+
+img_all_colors = cv2.cvtColor(img_original, cv2.COLOR_GRAY2RGB)
+
+img_original = morph(img_original)
 
 # TODO find color thresholds using kmeans
 
@@ -19,7 +26,6 @@ color_interval_len = 32
 for color_interval_start in range(color_interval_len, 255, color_interval_len):
     img = cv.inRange(img_original, color_interval_start, color_interval_start + color_interval_len)
 
-    img = morph(img)
     contours, hierarchy = cv.findContours(img, cv2.RETR_TREE, cv.CHAIN_APPROX_SIMPLE)
 
     # cv.drawContours(img, contours, -1, (0,255,0), 3)
@@ -72,13 +78,14 @@ for color_interval_start in range(color_interval_len, 255, color_interval_len):
 
         if currentHierarchy[3] < 0:
             create_graph(currentContour, (0, 0, 255), img_outer_cnt)
-            approx = cv.approxPolyDP(currentContour, 0.01 * cv.arcLength(currentContour, True), True)
+            approx = cv.approxPolyDP(currentContour, 0.001 * cv.arcLength(currentContour, True), True)
             create_graph(approx, (0, 0, 255), img_approx)
             hull = approx
             create_graph(hull, (0, 0, 255), img_hulls)
             area = cv.contourArea(approx)
             if area >= 10000:
                 create_graph(hull, (0, 0, 255), img_area_filtered)
+                create_graph(hull, (0, 0, 255), img_all_colors)
 
     # Finally show the image
     if not os.path.exists('data/steps'):
@@ -88,3 +95,4 @@ for color_interval_start in range(color_interval_len, 255, color_interval_len):
     cv.imwrite(f'data/steps/img_r{color_interval_start}_3_approx.png', img_approx)
     cv.imwrite(f'data/steps/img_r{color_interval_start}_4_hulls.png', img_hulls)
     cv.imwrite(f'data/steps/img_r{color_interval_start}_5_area_filtered.png', img_area_filtered)
+    cv.imwrite(f'data/steps/img_r{color_interval_start}_5_img_all_colors.png', img_all_colors)
