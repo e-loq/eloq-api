@@ -7,9 +7,6 @@ import pye57
 
 def get_distributions(df:pd.DataFrame, col:str):
     dc = df[col]
-    # dc.plot.hist(bins=90)
-    # plt.show()
-    # plt.close()
     return dc
 
 
@@ -31,8 +28,8 @@ gmm = gmm.fit(sampled_data.reshape(-1,1))
 floor_id = np.argmin(gmm.means_)
 ceil_id = np.argmax(gmm.means_)
 
-floor_cutoff = (gmm.means_[floor_id] + np.sqrt(gmm.covariances_[floor_id])*2).reshape(-1)[0]
-ceil_cutoff = (gmm.means_[ceil_id] - np.sqrt(gmm.covariances_[ceil_id])*1.0).reshape(-1)[0]
+floor_cutoff = (gmm.means_[floor_id] + np.sqrt(gmm.covariances_[floor_id])*0.0).reshape(-1)[0]
+ceil_cutoff = (gmm.means_[ceil_id] - np.sqrt(gmm.covariances_[ceil_id])*2.0).reshape(-1)[0]
 
 df = df[df.cartesianZ > floor_cutoff]
 df = df[df.cartesianZ < ceil_cutoff-2]
@@ -47,7 +44,7 @@ coords.cartesianX -= minx
 coords.cartesianY -= miny
 coords.cartesianZ -= minz
 
-amount = 1000
+amount = 100
 coords.cartesianX *= amount
 coords.cartesianX = coords.cartesianX.round().astype(np.int32)
 
@@ -70,20 +67,4 @@ for x, y, z in zip(cartesianX, cartesianY, cartesianZ):
     img[x][y] = max(img[x][y], (255 * (z - minZ)) / (maxZ - minZ))
 
 img = Image.fromarray(img, "L")
-img.save('data/image_test.png')
-
-
-print("")
-'''
-    matrix_bw = np.zeros([maxx + 1, maxy + 1], np.uint8)
-    matrix_bw[coords.cartesianX.values, coords.cartesianY.values] = 255
-    img = Image.fromarray(matrix_bw, "L")
-    return img
-'''
-
-
-# TODO: neighbours points might differ extrem in the z-axis
-
-
-
-#df_plot = df[["cartesianX", "cartesianY", "cartesianZ"]]
+img.save('data/image_100_floorincluded.png')
